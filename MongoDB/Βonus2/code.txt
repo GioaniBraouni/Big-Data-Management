@@ -1,0 +1,99 @@
+db.getCollection("GBvideos").aggregate(
+
+	// Pipeline
+	[
+		// Stage 1
+		{
+			$project: {
+			'video_id': 1,
+			'trending_date': 1,
+			'publish_time': 1
+			}
+		},
+
+		// Stage 2
+		{
+			$addFields: {
+			'publish_date': {
+			'$dateToString': {
+			'format': '%Y-%m-%d',
+			'date': {
+			'$toDate': '$publish_time'
+			}
+			}
+			}
+			}
+		},
+
+		// Stage 3
+		{
+			$addFields: {
+			'new_date_tr': {
+			'$replaceAll': {
+			'input': '$trending_date',
+			'find': '.',
+			'replacement': '-'
+			}
+			}
+			}
+		},
+
+		// Stage 4
+		{
+			$addFields: {
+			'final_Date_TR': {
+			'$concat': [
+			'20', '', '$new_date_tr'
+			]
+			}
+			}
+		},
+
+		// Stage 5
+		{
+			$set: {
+			'final_Date_pl': {
+			'$dateFromString': {
+			'dateString': '$publish_date'
+			}
+			}
+			}
+		},
+
+		// Stage 6
+		{
+			$set: {
+			'new_date_TRENDING': {
+			'$dateFromString': {
+			'dateString': '$final_Date_TR',
+			'format': '%Y-%d-%m'
+			}
+			}
+			}
+		},
+
+		// Stage 7
+		{
+			$group: {
+			'_id':"Μέσος όρος για όλα τα video",
+			'averageTime': {
+			'$avg': {
+			'$dateDiff': {
+			'startDate': '$final_Date_pl',
+			'endDate': '$new_date_TRENDING',
+			'unit': 'day'
+			}
+			}
+			}
+			}
+		},
+	],
+
+	// Options
+	{
+
+	}
+
+	// Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
+
+);

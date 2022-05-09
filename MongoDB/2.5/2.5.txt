@@ -1,0 +1,55 @@
+db.getCollection("GBvideos").aggregate(
+
+	// Pipeline
+	[
+	
+		// Stage 9
+		{
+			$addFields: { 
+			    "date" : { 
+			        "$dateToString" : { 
+			            "format" : "%Y-%m-%d", 
+			            "date" : { 
+			                "$toDate" : "$publish_time"
+			            }
+			        }
+			    }
+			}
+		},
+
+		// Stage 10
+		{
+			$match: { 
+			    "date" : { 
+			        "$gte" : "2017-12-05", 
+			        "$lte" : "2018-03-05"
+			    }
+			}
+		},
+
+		// Stage 11
+		{
+			$group: { 
+			    "_id" : "$date", 
+			    "count" : { 
+			        "$sum" : 1.0
+			    }
+			}
+		},
+
+		// Stage 12
+		{
+			$sort: { 
+			    "_id" : 1.0
+			}
+		},
+	],
+
+	// Options
+	{
+
+	}
+
+	// Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
+
+);

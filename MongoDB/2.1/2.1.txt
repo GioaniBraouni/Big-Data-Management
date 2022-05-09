@@ -1,0 +1,52 @@
+// Requires official MongoShell 3.6+
+db = db.getSiblingDB("MongoDBProject");
+db.getCollection("GBVideos").aggregate(
+   [{
+    $project: {
+        _id: 0,
+        video_id: 0,
+        trending_date: 0,
+        category_id: 0,
+        publish_time: 0,
+        tags: 0,
+        comment_count: 0,
+        thumbnail_link: 0,
+        comments_disabled: 0,
+        ratings_disabled: 0,
+        video_error_or_removed: 0,
+        description: 0
+    }
+}, {
+    $match: {
+        channel_title: {
+            $eq: 'Saturday Night Live'
+        }
+    }
+}, {
+    $set: {
+        views: {
+            $toInt: '$views'
+        }
+    }
+}, {
+    $group: {
+        _id: '$title',
+        views: {
+            $last: '$views'
+        },
+        likes: {
+            $last: '$likes'
+        },
+        dislikes: {
+            $last: '$dislikes'
+        }
+    }
+}, {
+    $sort: {
+        views: -1
+    }
+}], 
+    { 
+        "allowDiskUse" : false
+    }
+);

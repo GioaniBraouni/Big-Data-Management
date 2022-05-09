@@ -1,0 +1,156 @@
+db.getCollection("GB").aggregate(
+
+	// Pipeline
+	[
+		// Stage 1
+		{
+			$lookup: {
+			from: 'GB_JSON',
+			localField: 'category_id',
+			foreignField: 'items.id',
+			as: 'category_title'
+			}
+		},
+
+		// Stage 2
+		{
+			$project: {
+			id: 0,
+			trending_date: 0,
+			title: 0,
+			channel_title: 0,
+			publish_time: 0,
+			likes: 0,
+			dislikes: 0,
+			comment_count: 0,
+			thumbnail_link: 0,
+			comments_disabled: 0,
+			ratings_disabled: 0,
+			video_error_or_removed: 0,
+			description: 0
+			}
+		},
+
+		// Stage 3
+		{
+			$unwind: '$category_title'
+		},
+
+		// Stage 4
+		{
+			$unwind: '$category_title.items'
+		},
+
+		// Stage 5
+		{
+			$addFields: {
+			category_idFromJSON: '$category_title.items.id',
+			category_TitleFromJSON: '$category_title.items.snippet.title'
+			}
+		},
+
+		// Stage 6
+		{
+			$set: {
+			category_id: {
+			 $toInt: '$category_id'
+			},
+			category_idFromJSON: {
+			 $toInt: '$category_idFromJSON'
+			}
+			}
+		},
+
+		// Stage 7
+		{
+			$match: {
+			$expr: {
+			 $eq: [
+			  '$category_id',
+			  '$category_idFromJSON'
+			 ]
+			}
+			}
+		},
+
+		// Stage 8
+		{
+			$project: {
+			category_title: 0,
+			category_id: 0,
+			category_idFromJSON: 0
+			}
+		},
+
+		// Stage 9
+		{
+			$set: {
+			tags: {
+			 $split: [
+			  '$tags',
+			  '"|"'
+			 ]
+			},
+			views: {
+			 $toInt: '$views'
+			}
+			}
+		},
+
+		// Stage 10
+		{
+			$addFields: {
+			tagsSize: {
+			 $cond: {
+			  'if': {
+			   $eq: [
+			    {
+			     $arrayElemAt: [
+			      '$tags',
+			      0
+			     ]
+			    },
+			    '[none]'
+			   ]
+			  },
+			  then: 0,
+			  'else': {
+			   $size: '$tags'
+			  }
+			 }
+			}
+			}
+		},
+
+		// Stage 11
+		{
+			$group: {
+			_id: '$video_id',
+			total_tags: {
+			 $first: '$tagsSize'
+			},
+			total_views: {
+			 $last: '$views'
+			},
+			category_title: {
+			 $first: '$category_TitleFromJSON'
+			}
+			}
+		},
+
+		// Stage 12
+		{
+			$sort: {
+			total_views: -1
+			}
+		},
+	],
+
+	// Options
+	{
+
+	}
+
+	// Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
+
+);

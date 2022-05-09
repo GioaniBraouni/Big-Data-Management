@@ -1,0 +1,71 @@
+// Requires official MongoShell 3.6+
+db = db.getSiblingDB("MongoDBProject");
+db.getCollection("USvideos").aggregate(
+    [
+		// Stage 1
+		{
+			$project: {
+			  '_id': 0, 
+			  'trending_date': 0, 
+			  'title': 0, 
+			  'channel_title': 0, 
+			  'category_id': 0, 
+			  'publish_time': 0, 
+			  'views': 0, 
+			  'likes': 0, 
+			  'dislikes': 0, 
+			  'comment_count': 0, 
+			  'thumbnail_link': 0, 
+			  'comments_disabled': 0, 
+			  'ratings_disabled': 0, 
+			  'video_error_or_removed': 0, 
+			  'description': 0
+			}
+		},
+
+		// Stage 2
+		{
+			$set: {
+			  'tags': {
+			    '$split': [
+			      '$tags', '"|"'
+			    ]
+			  }
+			}
+		},
+
+		// Stage 3
+		{
+			$match: {
+			  'tags': {
+			    '$ne': '[none]'
+			  }
+			}
+		},
+
+		// Stage 4
+		{
+			$unwind: '$tags'
+		},
+
+		// Stage 5
+		{
+			$group: {
+			  '_id': '$tags', 
+			  'total_tags': {
+			    '$sum': 1
+			  }
+			}
+		},
+
+		// Stage 6
+		{
+			$sort: {
+			  'total_tags': -1
+			}
+		},
+	], 
+    { 
+        "allowDiskUse" : false
+    }
+);

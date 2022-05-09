@@ -1,0 +1,62 @@
+[{$lookup: {
+ from: 'US_JSON',
+ localField: 'category_id',
+ foreignField: 'items.id',
+ as: 'category_title'
+}}, {$project: {
+ id: 0,
+ trending_date: 0,
+ title: 0,
+ channel_title: 0,
+ publish_time: 0,
+ likes: 0,
+ dislikes: 0,
+ comment_count: 0,
+ thumbnail_link: 0,
+ comments_disabled: 0,
+ ratings_disabled: 0,
+ video_error_or_removed: 0,
+ description: 0
+}}, {$unwind: '$category_title'}, {$unwind: '$category_title.items'}, {$addFields: {
+ category_idFromJSON: '$category_title.items.id',
+ category_TitleFromJSON: '$category_title.items.snippet.title'
+}}, {$set: {
+ category_id: {
+  $toInt: '$category_id'
+ },
+ category_idFromJSON: {
+  $toInt: '$category_idFromJSON'
+ }
+}}, {$match: {
+ $expr: {
+  $eq: [
+   '$category_id',
+   '$category_idFromJSON'
+  ]
+ }
+}}, {$project: {
+ category_title: 0,
+ category_id: 0,
+ category_idFromJSON: 0
+}}, {$set: {
+ tags: {
+  $split: [
+   '$tags',
+   '"|"'
+  ]
+ }
+}}, {$match: {
+ tags: {
+  $ne: '[none]'
+ }
+}}, {$unwind: '$tags'}, {$group: {
+ _id: '$tags',
+ total_tags: {
+  $sum: 1
+ },
+ category_titles: {
+  $addToSet: '$category_TitleFromJSON'
+ }
+}}, {$sort: {
+ total_tags: -1
+}}]

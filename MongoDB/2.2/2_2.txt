@@ -1,0 +1,96 @@
+db.getCollection("GB").aggregate(
+
+	// Pipeline
+	[
+		// Stage 1
+		{
+			$project: {
+			  '_id': 0, 
+			  'trending_date': 0, 
+			  'title': 0, 
+			  'channel_title': 0, 
+			  'category_id': 0, 
+			  'publish_time': 0, 
+			  'likes': 0, 
+			  'dislikes': 0, 
+			  'comment_count': 0, 
+			  'thumbnail_link': 0, 
+			  'comments_disabled': 0, 
+			  'ratings_disabled': 0, 
+			  'video_error_or_removed': 0, 
+			  'description': 0
+			}
+		},
+
+		// Stage 2
+		{
+			$set: {
+			  'tags': {
+			    '$split': [
+			      '$tags', '"|"'
+			    ]
+			  }
+			}
+		},
+
+		// Stage 3
+		{
+			$set: {
+			  'views': {
+			    '$toInt': '$views'
+			  }
+			}
+		},
+
+		// Stage 4
+		{
+			$addFields: {
+			  'tagsSize': {
+			    '$cond': {
+			      'if': {
+			        '$eq': [
+			          {
+			            '$arrayElemAt': [
+			              '$tags', 0
+			            ]
+			          }, '[none]'
+			        ]
+			      }, 
+			      'then': 0, 
+			      'else': {
+			        '$size': '$tags'
+			      }
+			    }
+			  }
+			}
+		},
+
+		// Stage 5
+		{
+			$group: {
+			  '_id': '$video_id', 
+			  'total_tags': {
+			    '$first': '$tagsSize'
+			  }, 
+			  'total_views': {
+			    '$last': '$views'
+			  }
+			}
+		},
+
+		// Stage 6
+		{
+			$sort: {
+			  'total_views': -1
+			}
+		},
+	],
+
+	// Options
+	{
+
+	}
+
+	// Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
+
+);

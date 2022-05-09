@@ -1,0 +1,70 @@
+[{$lookup: {
+ from: 'GB.JSON',
+ localField: 'category_id',
+ foreignField: 'items.id',
+ as: 'category_title'
+}}, {$project: {
+ _id: 0,
+ trending_date: 0,
+ title: 0,
+ channel_title: 0,
+ comment_count: 0,
+ thumbnail_link: 0,
+ ratings_disabled: 0,
+ video_error_or_removed: 0,
+ description: 0
+}}, {$unwind: '$category_title'}, {$unwind: '$category_title.items'}, {$addFields: {
+ category_idFromJSON: '$category_title.items.id',
+ category_TitleFromJSON: '$category_title.items.snippet.title'
+}}, {$set: {
+ category_id: {
+  $toInt: '$category_id'
+ },
+ category_idFromJSON: {
+  $toInt: '$category_idFromJSON'
+ }
+}}, {$match: {
+ $expr: {
+  $eq: [
+   '$category_id',
+   '$category_idFromJSON'
+  ]
+ }
+}}, {$group: {
+ _id: '$video_id',
+ views: {
+  $last: '$views'
+ },
+ likes: {
+  $last: '$likes'
+ },
+ dislikes: {
+  $last: '$dislikes'
+ },
+ comments_disabled: {
+  $first: '$comments_disabled'
+ },
+ category_title: {
+  $first: '$category_TitleFromJSON'
+ }
+}}, {$group: {
+ _id: '$comments_disabled',
+ avg_views: {
+  $avg: {
+   $toInt: '$views'
+  }
+ },
+ avg_likes: {
+  $avg: {
+   $toInt: '$likes'
+  }
+ },
+ avg_dislikes: {
+  $avg: {
+   $toInt: '$dislikes'
+  }
+ },
+ category_titles: {
+  $addToSet: '$category_title'
+ }
+}}]
