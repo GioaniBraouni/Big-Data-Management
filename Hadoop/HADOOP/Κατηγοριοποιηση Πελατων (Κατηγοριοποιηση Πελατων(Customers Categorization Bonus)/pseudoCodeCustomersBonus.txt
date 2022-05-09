@@ -1,0 +1,39 @@
+void Map(FILE fileName, String line) 
+{
+	id = line[0];
+	wines = line[9];
+	fruits = line[10];
+	meat = line[11];
+	fish = line[12];
+	sweet = line[13];
+	gold = line[14];
+	income = line[4];
+	date = line[7];
+	
+	totalSpent = (Wines + Fruits + Meat + Fish + Sweet + Gold);
+	if(totalSpent<=averageTotalSpent/4)
+	{
+		if(income<51687.45)
+		{
+			if(date==21)
+				emit(Bronze,id);
+			else
+				emit(Papeer,id);			
+		}
+	}
+}
+
+double sum = 0;
+int count=0;
+double averageTotalSpent=0;
+
+void Reduce(Text t, long[] values) 
+{
+	ArrayList list;
+	foreach (long i in values)
+	{
+	  list.add(i);
+	}
+	sort.list
+	emit(t, list);
+}

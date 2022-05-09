@@ -1,0 +1,20 @@
+void Map(FILE fileName, String line) 
+{
+	income = line[4];
+	emit(Text,income);
+}
+
+double sum = 0;
+int count=0;
+double averageIncome=0;
+
+void Reduce(Text t, double[] values) 
+{
+	foreach (double i in values)
+	{
+	  sum += i;
+	  count++;
+	}
+	averageIncome = sum/count;
+	emit(t, averageIncome);
+}

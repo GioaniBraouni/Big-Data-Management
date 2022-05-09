@@ -1,0 +1,20 @@
+void Map(FILE fileName, String line) 
+{
+	mntWine = line[9];
+	emit(text,mntWine)
+}
+
+void Reduce(Text t, double[] counts) 
+{
+	double sum = 0;
+	int count=0;
+	double averageTotalSpent=0;
+
+	foreach (double i in counts)
+	{
+	  sum += i;
+	  count++;
+	}
+	averageTotalSpent = sum/count;
+	emit(t, averageTotalSpent);
+}

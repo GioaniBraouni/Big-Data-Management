@@ -1,0 +1,28 @@
+void Map(FILE fileName, String line) 
+{
+	mntWine = line[9];
+	diffAge = 2021 - line_tokens[1];
+	ID = line_tokens[0]; 
+	Age = diffAge; 
+	Education = line_tokens[2]; 
+	Marital_Status = line_tokens[3]; 
+	Income = line_tokens[4];
+	MntWines = line_tokens[9];
+
+	if(mntWine>=(average*1.5)
+	{
+	   emit(mntWine,ID + Age + Education + Marital_Status + Income + MntWines);
+	}
+}
+
+int count=0;
+void Reduce(Int key, Text[] text) 
+{
+	count++;
+	foreach (double i in counts)
+	{
+	  sum += i;
+	  count++;
+	}
+	emit(count, text);
+}

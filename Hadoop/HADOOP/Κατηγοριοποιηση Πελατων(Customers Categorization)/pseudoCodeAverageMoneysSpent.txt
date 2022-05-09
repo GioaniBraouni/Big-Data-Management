@@ -1,0 +1,28 @@
+void Map(FILE fileName, String line) 
+{
+	wines = line[9];
+	fruits = line[10];
+	meat = line[11];
+	fish = line[12];
+	sweet = line[13];
+	gold = line[14];
+	
+	totalSpent = (Wines + Fruits + Meat + Fish + Sweet + Gold);
+	emit(Text,totalSpent);
+}
+
+double sum = 0;
+int count=0;
+double averageTotalSpent=0;
+
+void Reduce(Text t, double[] values) 
+{
+	foreach (double i in values)
+	{
+	  sum += i;
+	  count++;
+	}
+
+	averageTotalSpent = sum/count;
+	emit(t, averageTotalSpent);
+}

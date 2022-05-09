@@ -1,0 +1,15 @@
+void Map(FILE fileName, String line) 
+{
+	education = line[2];
+	emit(education ,1)
+}
+
+void Reduce(Word w, int[] counts) 
+{
+	int sum = 0;
+	foreach (int i in counts)
+	{
+	  sum += i;
+	}
+	emit(w, sum);
+}
